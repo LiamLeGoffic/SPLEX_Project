@@ -1,0 +1,2 @@
+All raw OU usage stats were acquired at https://www.smogon.com/stats/
+Starting from ou-0 and ubers-0 (2014-11), every subsequent file is from a month later. 
