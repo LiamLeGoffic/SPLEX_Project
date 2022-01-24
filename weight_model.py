@@ -4,7 +4,7 @@ import numpy as np
 from collections import Counter
 from src.weight_method import *
 
-data = pd.read_csv('Pokemon.csv')
+data = pd.read_csv('data/Pokemon.csv')
 feature_int = [feature for feature in data.columns if type(data[feature][0])==np.int64 and feature not in ['Generation', '#']]
 test=data[feature_int]
 classes = list(data['Legendary'])
