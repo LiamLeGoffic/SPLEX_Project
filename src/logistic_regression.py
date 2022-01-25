@@ -56,12 +56,13 @@ def K_fold_logistic_regression(data, features, target, k):
     Y = [row[1][target] for row in data.iterrows()]
     n = len(X)
     for i in range(k):
+        print('k folding n°', i+1)
         start = int(i*n/k)
         end = int((i+1)*n/k)
-        X_train, X_test = X[start:end], X[:start]+X[end:]
-        Y_train, Y_test = Y[start:end], Y[:start]+Y[end:]
-        print(len(X_train), len(Y_test))
-        print(sum(Y_train), sum(Y_test))
+        X_test, X_train = X[start:end], X[:start]+X[end:]
+        Y_test, Y_train = Y[start:end], Y[:start]+Y[end:]
+        print('SIZE :\ntrain ->', len(X_train), '/ validation ->', len(X_test))
+        print('NUMBER OF LEGENDARIES :\ntrain ->', sum(Y_train), '/ validation ->', sum(Y_test))
         theta = np.random.uniform(size=len(X_train[0]))
         theta = gradientDescent(X_train, Y_train, len(X_train[0]), theta, 0.001)
         accuracy_rate, error_rate = test(X_test, Y_test, len(Y_test), theta)
