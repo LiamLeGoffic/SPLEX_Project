@@ -1,4 +1,5 @@
 import numpy as np
+from IPython.display import clear_output
 
 def updateTypeColumn(dataframe, columnName, columnValue):
     for index, row in dataframe.iterrows():
@@ -48,25 +49,35 @@ def test(x, y, m, theta):
             correct += 1
     return correct/m, (1 - (correct/m))
 
-def K_fold_logistic_regression(data, features, target, k):
+def K_fold_logistic_regression(data, features, target, k, N=1, iterations=1500):
     Accuracy = []
     Error = []
-    data = data.sample(frac=1)
-    X = [[row[1][feature] for feature in features] for row in data.iterrows()]
-    Y = [row[1][target] for row in data.iterrows()]
-    n = len(X)
-    for i in range(k):
-        print('k folding n°', i+1)
-        start = int(i*n/k)
-        end = int((i+1)*n/k)
-        X_test, X_train = X[start:end], X[:start]+X[end:]
-        Y_test, Y_train = Y[start:end], Y[:start]+Y[end:]
-        print('SIZE :\ntrain ->', len(X_train), '/ validation ->', len(X_test))
-        print('NUMBER OF LEGENDARIES :\ntrain ->', sum(Y_train), '/ validation ->', sum(Y_test))
-        theta = np.random.uniform(size=len(X_train[0]))
-        theta = gradientDescent(X_train, Y_train, len(X_train[0]), theta, 0.001)
-        accuracy_rate, error_rate = test(X_test, Y_test, len(Y_test), theta)
-        #print(theta)
-        Accuracy.append(accuracy_rate)
-        Error.append(error_rate)
-    return Accuracy, Error
+    Thetas = []
+    for it in range(N):
+        if N!=1:
+            clear_output()
+            print(it+1, '/', N)
+        data = data.sample(frac=1)
+        X = [[row[1][feature] for feature in features] for row in data.iterrows()]
+        Y = [row[1][target] for row in data.iterrows()]
+        n = len(X)
+        for i in range(k):
+            start = int(i*n/k)
+            end = int((i+1)*n/k)
+            X_test, X_train = X[start:end], X[:start]+X[end:]
+            Y_test, Y_train = Y[start:end], Y[:start]+Y[end:]
+            theta = np.random.uniform(size=len(X_train[0]))
+            theta = gradientDescent(X_train, Y_train, len(X_train[0]), theta, 0.001, iterations=iterations)
+            accuracy_rate, error_rate = test(X_test, Y_test, len(Y_test), theta)
+            if N==1:
+                print('k folding n°', i+1)
+                print('SIZE :\ntrain ->', len(X_train), '/ validation ->', len(X_test))
+                print('NUMBER OF LEGENDARIES :\ntrain ->', sum(Y_train), '/ validation ->', sum(Y_test))
+                print(theta)
+            else:
+                Thetas.append(theta)
+            Accuracy.append(accuracy_rate)
+            Error.append(error_rate)
+        if N==1:
+            return Accuracy, Error
+    return np.mean(Accuracy), np.mean(Error), np.mean(Thetas, axis=0)
