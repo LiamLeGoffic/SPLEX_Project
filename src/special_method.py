@@ -52,7 +52,7 @@ def K_fold_special_method(data, features, target, k, N, constant):
             Y_test, Y_train = Y.iloc[start:end], pd.concat([Y.iloc[:start], Y.iloc[end:]], axis=0)
             corr = pd.concat([X_train, Y_train], axis=1).corr()[target][features]
             pred = special_method(X_test, corr, constant, features)
-            acc, pre, rec, f_score = test_sp(pred, Y_test)
+            acc, pre, rec, f_score = test_sm(pred, Y_test)
             Accuracy.append(acc)
             Precision.append(pre)
             Recall.append(rec)
