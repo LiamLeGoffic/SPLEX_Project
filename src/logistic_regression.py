@@ -29,26 +29,32 @@ def gradientDescent(x, y, m, theta, alpha, iterations=1500):
     return theta
 
 # from https://medium.com/@DataStevenson/logistic-regression-and-pokemon-945e954d84a3
-# get the accuracy and the error on the testing set
+# get the accuracy and the precision on the testing set
 def test(x, y, m, theta):
-    correct = 0
+    TP, FP, TN, FN = 0, 0, 0, 0
     for i in range(m):
         z = np.dot(
                 np.transpose(theta),
                 x[i]
             )
         predicted_value = sigmoid(z)
-        if predicted_value >= 0.5 and y[i] == 1:
-            correct += 1
-        elif predicted_value < 0.5 and y[i] == 0:
-            correct += 1
-    return correct/m, (1 - (correct/m))
+        if predicted_value >= 0.5:
+            if y[i] == 1:
+                TP += 1
+            else:
+                FP += 1
+        elif predicted_value < 0.5:
+            if y[i] == 0:
+                TN += 1
+            else:
+                FN += 1
+    return (TP+TN)/len(y), TP/max(1, (TP+FP))
 
-# K-fold validation with N different shuffles of the dataset and get the average accuracy, the average error and the 
+# K-fold validation with N different shuffles of the dataset and get the average accuracy, the average precision and the 
 # different average weights of each feature (Theta)
 def K_fold_logistic_regression(data, features, target, k, N=1, iterations=1500):
     Accuracy = []
-    Error = []
+    Precision = []
     Thetas = []
     for it in range(N):
         if N!=1:
@@ -65,7 +71,7 @@ def K_fold_logistic_regression(data, features, target, k, N=1, iterations=1500):
             Y_test, Y_train = Y[start:end], Y[:start]+Y[end:]
             theta = np.random.uniform(size=len(X_train[0]))
             theta = gradientDescent(X_train, Y_train, len(X_train[0]), theta, 0.001, iterations=iterations)
-            accuracy_rate, error_rate = test(X_test, Y_test, len(Y_test), theta)
+            acc, pre = test(X_test, Y_test, len(Y_test), theta)
             if N==1:
                 print('k folding n°', i+1)
                 print('SIZE :\ntrain ->', len(X_train), '/ validation ->', len(X_test))
@@ -73,8 +79,8 @@ def K_fold_logistic_regression(data, features, target, k, N=1, iterations=1500):
                 print(theta)
             else:
                 Thetas.append(theta)
-            Accuracy.append(accuracy_rate)
-            Error.append(error_rate)
+            Accuracy.append(acc)
+            Precision.append(pre)
         if N==1:
-            return Accuracy, Error
-    return np.mean(Accuracy), np.mean(Error), np.mean(Thetas, axis=0)
+            return Accuracy, Precision
+    return np.mean(Accuracy), np.mean(Precision), np.mean(Thetas, axis=0)
