@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+from IPython.display import clear_output
 
-def liam_method(data, corr, constant):
+def liam_method(data, corr, constant, features):
     pred = []
     for i in range(len(data.iloc[:,0])):
-        n = np.dot(np.transpose(corr), data[features_int].iloc[i, :])
+        n = np.dot(np.transpose(corr), data[features].iloc[i, :])
         if n-constant>=0:
             pred.append(1)
         else:
@@ -46,8 +46,8 @@ def K_fold_liam_method(data, features, target, k, N, constant):
             end = int((i+1)*n/k)
             X_test, X_train = X.iloc[start:end, :], pd.concat([X.iloc[:start, :], X.iloc[end:, :]], axis=0)
             Y_test, Y_train = Y.iloc[start:end], pd.concat([Y.iloc[:start], Y.iloc[end:]], axis=0)
-            corr = pd.concat([X_train, Y_train], axis=1).corr()[target][features_int]
-            pred = liam_method(X_test, corr, constant)
+            corr = pd.concat([X_train, Y_train], axis=1).corr()[target][features]
+            pred = liam_method(X_test, corr, constant, features)
             acc, pre, rec, f_score = test_lm(pred, Y_test)
             Accuracy.append(acc)
             Precision.append(pre)
