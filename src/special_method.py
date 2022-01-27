@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 from IPython.display import clear_output
 
-def liam_method(data, corr, constant, features):
+# get the predicted predictions thanks to the correlation of each feature with the classe (on the training set)
+def special_method(data, corr, constant, features):
     pred = []
     for i in range(len(data.iloc[:,0])):
         n = np.dot(np.transpose(corr), data[features].iloc[i, :])
@@ -12,7 +13,8 @@ def liam_method(data, corr, constant, features):
             pred.append(0)
     return pred
 
-def test_lm(pred, Y):
+# compare the predictions with the true classes
+def test_sm(pred, Y):
     TP, FP, TN, FN = 0, 0, 0, 0
     Y = list(Y)
     for i in range(len(pred)):
@@ -32,7 +34,9 @@ def test_lm(pred, Y):
     f_score = 2*pre*rec/max(1, (pre+rec))
     return acc, pre, rec, f_score
 
-def K_fold_liam_method(data, features, target, k, N, constant):
+# k-fold validation of the special method that is repeted N times with a different shuffle each time (because of the data size) 
+# and get the average accuracy, the average precision, the average recall and the average f-score
+def K_fold_special_method(data, features, target, k, N, constant):
     Accuracy, Precision, Recall, F_score = [], [], [], []
     for it in range(N):
         clear_output()
@@ -47,8 +51,8 @@ def K_fold_liam_method(data, features, target, k, N, constant):
             X_test, X_train = X.iloc[start:end, :], pd.concat([X.iloc[:start, :], X.iloc[end:, :]], axis=0)
             Y_test, Y_train = Y.iloc[start:end], pd.concat([Y.iloc[:start], Y.iloc[end:]], axis=0)
             corr = pd.concat([X_train, Y_train], axis=1).corr()[target][features]
-            pred = liam_method(X_test, corr, constant, features)
-            acc, pre, rec, f_score = test_lm(pred, Y_test)
+            pred = special_method(X_test, corr, constant, features)
+            acc, pre, rec, f_score = test_sp(pred, Y_test)
             Accuracy.append(acc)
             Precision.append(pre)
             Recall.append(rec)
