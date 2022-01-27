@@ -1,6 +1,8 @@
 import numpy as np
 from IPython.display import clear_output
 
+# from https://medium.com/@DataStevenson/logistic-regression-and-pokemon-945e954d84a3
+# numerize a column in binary values
 def updateTypeColumn(dataframe, columnName, columnValue):
     for index, row in dataframe.iterrows():
         if row.Legendary == columnValue:
@@ -8,19 +10,11 @@ def updateTypeColumn(dataframe, columnName, columnValue):
         else:
             dataframe.loc[index, columnName] = 0
 
+# from https://medium.com/@DataStevenson/logistic-regression-and-pokemon-945e954d84a3
 def sigmoid(z):
     return 1/(1 + np.exp(-z))
 
-def costFunction(x, y, m, theta):
-    loss = 0
-    for i in range(m):
-        z = np.dot(
-            np.transpose(theta),
-            x[i]
-        )
-        loss += y[i] * np.log(sigmoid(z)) + (1 - y[i]) * np.log(1 - sigmoid(z))
-    return -(1/m) * loss
-
+# from https://medium.com/@DataStevenson/logistic-regression-and-pokemon-945e954d84a3
 def gradientDescent(x, y, m, theta, alpha, iterations=1500):
     for iteration in range(iterations):
         for j in range(len(theta)):
@@ -32,9 +26,10 @@ def gradientDescent(x, y, m, theta, alpha, iterations=1500):
                 )
                 gradient += (sigmoid(z) - y[i]) * x[i][j]
             theta[j] = theta[j] - ((alpha/m) * gradient)
-        #print('Current Error is:', costFunction(x, y, m, theta))
     return theta
 
+# from https://medium.com/@DataStevenson/logistic-regression-and-pokemon-945e954d84a3
+# get the accuracy and the error on the testing set
 def test(x, y, m, theta):
     correct = 0
     for i in range(m):
@@ -49,6 +44,8 @@ def test(x, y, m, theta):
             correct += 1
     return correct/m, (1 - (correct/m))
 
+# K-fold validation with N different shuffles of the dataset and get the average accuracy, the average error and the 
+# different average weights of each feature (Theta)
 def K_fold_logistic_regression(data, features, target, k, N=1, iterations=1500):
     Accuracy = []
     Error = []
